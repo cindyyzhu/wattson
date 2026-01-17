@@ -236,7 +236,7 @@ class MusicModifier(Modifier):
 class BreathingConfig:
     """Configuration for breathing modifier."""
     amplitude: float = 2.0      # Degrees of movement
-    frequency: float = 0.2      # Breaths per second (0.2 = 12 breaths/min)
+    frequency: float = 0.3      # Breaths per second (0.2 = 12 breaths/min)
     phase_offset: float = 0.0   # Phase offset in radians
 
 
@@ -255,7 +255,10 @@ class BreathingModifier(Modifier):
     ):
         target_joints = target_joints or {"head_pitch.pos"}
         super().__init__("breathing", target_joints)
-        self.config = config or BreathingConfig()
+        self.config = config or BreathingConfig(
+           
+
+        )
 
     def get_offset(self, joint: str, current_time: float) -> float:
         if joint not in self.target_joints:
