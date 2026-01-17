@@ -15,6 +15,7 @@ import queue
 from dotenv import load_dotenv
 from groq import Groq
 from lelamp.service.agent.tools import Tool
+import numpy as np
 
 logging.basicConfig(level=logging.INFO, force=True)
 logger = logging.getLogger("Agent_Service")
@@ -195,6 +196,24 @@ class LLM:
         except Exception as e:
             pass
 
+    def output_callback(self, outdata, frames, time, status):
+        """Audio playback callback"""
+        if status:
+            logger.warning(f"Output status: {status}")
+
+        try:
+            samples = self.output_queue.get_nowait()
+
+            if len(samples) < frames:
+                samples = np.pad(samples, (0, frames - len(samples)))
+            elif len(samples) > frames:
+                samples = samples[:frames]
+
+            outdata[:] = samples.reshape(-1, 1)
+        except queue.Empty:
+            outdata.fill(0)
+
+
     async def send_audio(self, websocket):
         """Continuously read data from microphone queue and send to OpenAI"""
         while True:
@@ -236,6 +255,17 @@ class LLM:
                     current_stream_type = "text"
                 print(delta, end="", flush=True)
 
+            elif event_type == "response.audio.delta":
+                # Decode and play audio chunk
+                audio_b64 = event.get("delta", "")
+                if audio_b64:
+                    audio_bytes = base64.b64decode(audio_b64)
+                    # Convert to numpy and play
+                    samples = np.frombuffer(audio_bytes, dtype=np.int16).astype(np.float32) / 32768.0
+                    self.output_queue.put(samples)  # Queue for playback
+            elif event_type == "response.audio.done":
+                print("\n[AI finished speaking]")
+
             # --- 3. Response Ended ---
             elif event_type == "response.done":
                 if current_stream_type == "text":
@@ -269,6 +299,8 @@ class LLM:
                     }
                 }
                 await websocket.send(json.dumps(response_create_event))
+
+    
 
     async def start(self):
         self.loop = asyncio.get_running_loop()
