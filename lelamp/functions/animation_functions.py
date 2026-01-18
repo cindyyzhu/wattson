@@ -4,117 +4,13 @@ Animation/movement function tools for LeLamp
 This module contains all animation-related function tools including:
 - Getting available recordings
 - Playing movement recordings
-- Procedural Luxo-style animations
 """
 
 import logging
-import asyncio
-# Implied global service access as per project context
-from lelamp.globals import motor_service
 from lelamp.service.agent.tools import Tool
 
 
-class LuxoAnimations:
-    """
-    Procedural animations inspired by Luxo Jr.
-    Uses 'neck_servo' and 'head_servo' via the global motor_service.
-    """
-
-    async def play_nod(self):
-        """A quick, energetic double-nod."""
-        # Center: 2048. Range: ~1000-3000 safe.
-        # Head down, then up, then center.
-        if not motor_service: return
-        
-        # Fast speed for energetic feel (duration=0.1s)
-        await motor_service.move_to("head_servo", 1800, 0.15)
-        await asyncio.sleep(0.15)
-        await motor_service.move_to("head_servo", 2300, 0.15)
-        await asyncio.sleep(0.15)
-        await motor_service.move_to("head_servo", 1900, 0.15)
-        await asyncio.sleep(0.15)
-        await motor_service.move_to("head_servo", 2048, 0.15)
-        await asyncio.sleep(0.15)
-
-    async def play_curious(self):
-        """A slow tilt of the head to the side followed by a slight neck extension."""
-        if not motor_service: return
-
-        # Tilt head (if roll available, otherwise pan/yaw)
-        # Slower speed for curiosity (duration=0.5s)
-        await motor_service.move_to("head_servo", 2300, 0.6) 
-        await asyncio.sleep(0.4)
-        
-        # Extend neck slightly up/forward
-        await motor_service.move_to("neck_servo", 2200, 0.6)
-        await asyncio.sleep(0.6)
-        
-        # Return to neutral slowly
-        await motor_service.move_to("head_servo", 2048, 0.8)
-        await motor_service.move_to("neck_servo", 2048, 0.8)
-        await asyncio.sleep(0.8)
-
-    async def play_excited(self):
-        """A 'hop' effect using quick vertical micro-movements of both servos."""
-        if not motor_service: return
-
-        # Quick hops
-        for _ in range(3):
-            # Crouch/Compress
-            await motor_service.move_to("neck_servo", 1800, 0.1)
-            await motor_service.move_to("head_servo", 1900, 0.1)
-            await asyncio.sleep(0.1)
-            
-            # Hop/Extend
-            await motor_service.move_to("neck_servo", 2300, 0.1)
-            await motor_service.move_to("head_servo", 2200, 0.1)
-            await asyncio.sleep(0.1)
-            
-        # Settle
-        await motor_service.move_to("neck_servo", 2048, 0.3)
-        await motor_service.move_to("head_servo", 2048, 0.3)
-        await asyncio.sleep(0.3)
-
-    async def play_sad(self):
-        """A slow, slumped dejection where the head drops to its minimum limit."""
-        if not motor_service: return
-
-        # Slow droop
-        await motor_service.move_to("head_servo", 1400, 1.5) # Head down
-        await asyncio.sleep(0.5)
-        await motor_service.move_to("neck_servo", 1400, 1.5) # Neck down
-        await asyncio.sleep(1.5)
-        
-        # Sigh (slight lift and drop)
-        await motor_service.move_to("head_servo", 1500, 0.4)
-        await asyncio.sleep(0.4)
-        await motor_service.move_to("head_servo", 1300, 0.6)
-        await asyncio.sleep(0.6)
-
-    @Tool.register_tool
-    async def play_animation(self, animation_type: str) -> str:
-        """
-        Play a procedural Luxo-style animation to express emotion.
-        
-        Args:
-            animation_type: One of 'nod', 'curious', 'excited', 'sad'.
-        """
-        anim_map = {
-            "nod": self.play_nod,
-            "curious": self.play_curious,
-            "excited": self.play_excited,
-            "sad": self.play_sad
-        }
-        
-        action = anim_map.get(animation_type.lower())
-        if action:
-            await action()
-            return f"Played animation: {animation_type}"
-        else:
-            return f"Unknown animation type: {animation_type}. Available: {list(anim_map.keys())}"
-
-
-class AnimationFunctions(LuxoAnimations):
+class AnimationFunctions:
     """Mixin class providing animation/movement function tools"""
 
     def _check_animation_enabled(self) -> str:
