@@ -7,6 +7,7 @@ This module contains all animation-related function tools including:
 """
 
 import logging
+import random
 from lelamp.service.agent.tools import Tool
 
 
@@ -20,6 +21,40 @@ class AnimationFunctions:
         if not getattr(self, 'animation_service', None):
             return "Animation is not available - animation service not initialized."
         return None
+
+    @Tool.register_tool
+    async def flip_coin(self) -> str:
+        """
+        Flip a virtual coin!
+        If it lands on Heads, I'll look up.
+        If it lands on Tails, I'll shake and wiggle!
+        Use this to make random decisions or just for fun.
+
+        Returns:
+            The result (Heads/Tails) and confirmation of the action performed.
+        """
+        # Check if animation is available
+        error = self._check_animation_enabled()
+        if error:
+            return f"Cannot flip coin with actions: {error}"
+
+        print("LeLamp: flip_coin function called")
+        
+        result = random.choice(["Heads", "Tails"])
+        
+        if result == "Heads":
+            action = "look_up"
+            action_desc = "looking up"
+        else:
+            action = "happy_wiggle"
+            action_desc = "wiggling"
+
+        try:
+            # Dispatch the animation
+            self.animation_service.dispatch("play", action)
+            return f"The coin landed on... {result}! I am {action_desc}!"
+        except Exception as e:
+            return f"The coin landed on {result}, but I couldn't move: {str(e)}"
 
     @Tool.register_tool
     async def get_available_recordings(self) -> str:
