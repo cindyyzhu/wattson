@@ -245,7 +245,7 @@ webui:
   port: 80
 spotify:
   enabled: true
-  redirect_uri: https://halox.local:8888/api/v1/spotify/auth/callback
+  redirect_uri: http://127.0.0.1:8888/api/v1/spotify/auth/callback
   device_name: HaloX
 modifiers:
   music:
