@@ -184,7 +184,16 @@ class VisionService:
 
     def set_hand_callback(self, callback: Callable[[HandData], None]):
         """Set callback for hand tracking data"""
+        # #region agent log
+        import json, time
+        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"vision_service.py:185","message":"set_hand_callback() called","data":{"callback_is_none":callback is None},"timestamp":int(time.time()*1000)})+'\n')
+        # #endregion
         self._hand_callback = callback
+        # #region agent log
+        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"vision_service.py:187","message":"Hand callback registered","data":{"hand_callback_is_none":self._hand_callback is None},"timestamp":int(time.time()*1000)})+'\n')
+        # #endregion
 
     def _camera_loop(self):
         """Main camera capture and processing loop"""
@@ -288,11 +297,29 @@ class VisionService:
                     self.logger.error(f"Error in motor tracking callback: {e}")
 
             # Hand Tracking
+            # #region agent log
+            import json, time
+            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"B,C","location":"vision_service.py:291","message":"Hand tracking check","data":{"hand_callback_is_none":self._hand_callback is None,"hand_data_is_none":hand_data is None,"hand_detected":hand_data.detected if hand_data else False,"is_pinching":hand_data.is_pinching if hand_data else False},"timestamp":int(time.time()*1000)})+'\n')
+            # #endregion
             if self._hand_callback and hand_data and hand_data.detected:
+                # #region agent log
+                with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+                    f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"B,C","location":"vision_service.py:293","message":"Calling hand callback","data":{"is_pinching":hand_data.is_pinching,"position":hand_data.position if hand_data else None},"timestamp":int(time.time()*1000)})+'\n')
+                # #endregion
                 try:
                     self._hand_callback(hand_data)
+                    # #region agent log
+                    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+                        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"C","location":"vision_service.py:295","message":"Hand callback executed successfully","data":{},"timestamp":int(time.time()*1000)})+'\n')
+                    # #endregion
                 except Exception as e:
                     self.logger.error(f"Error in hand callback: {e}")
+                    # #region agent log
+                    import traceback
+                    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+                        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"C","location":"vision_service.py:297","message":"Error in hand callback","data":{"error":str(e),"error_type":type(e).__name__,"traceback":traceback.format_exc()},"timestamp":int(time.time()*1000)})+'\n')
+                    # #endregion
 
             # FPS Control
             processing_time = time.time() - start_time

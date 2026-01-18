@@ -110,7 +110,25 @@ def init_hardware_services():
     # Workflow Service - for automation workflows
     _init_workflow_service(config)
 
-    # g.vision_service.set_hand_callback(g.animation_service.hand_control_callback)
+    # #region agent log
+    import json, time
+    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"server.py:113","message":"Before hand callback registration","data":{"vision_service_is_none":g.vision_service is None,"animation_service_is_none":g.animation_service is None},"timestamp":int(time.time()*1000)})+'\n')
+    # #endregion
+    # Register hand control callback
+    if g.vision_service and g.animation_service:
+        # #region agent log
+        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"server.py:116","message":"Registering hand callback","data":{},"timestamp":int(time.time()*1000)})+'\n')
+        # #endregion
+        g.vision_service.set_hand_callback(g.animation_service.hand_control_callback)
+        logger.info("Hand control callback registered")
+    else:
+        # #region agent log
+        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"server.py:122","message":"Cannot register hand callback - services not available","data":{"vision_service_is_none":g.vision_service is None,"animation_service_is_none":g.animation_service is None},"timestamp":int(time.time()*1000)})+'\n')
+        # #endregion
+        logger.warning("Cannot register hand callback - vision or animation service not available")
 
     # Set system volumes
     # _set_system_volumes(config)
@@ -224,18 +242,33 @@ def _init_audio_service(config: dict):
 def _init_theme_service(config: dict):
     """Initialize theme service."""
     from lelamp.service.theme import init_theme_service, ThemeSound
-
+    # #region agent log
+    import json, time
+    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"F","location":"server.py:224","message":"_init_theme_service() called","data":{},"timestamp":int(time.time()*1000)})+'\n')
+    # #endregion
     theme_config = config.get("theme", {})
     theme_name = theme_config.get("name", "Lelamp")
-
+    # #region agent log
+    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"F","location":"server.py:229","message":"Before init_theme_service()","data":{"theme_name":theme_name},"timestamp":int(time.time()*1000)})+'\n')
+    # #endregion
     try:
         g.theme_service = init_theme_service(theme_name=theme_name)
         # Note: Startup sound is played by the agent (lelamp.py) when it initializes
         # Don't play here to avoid duplicate sounds
         logger.info("Theme service initialized")
+        # #region agent log
+        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"F","location":"server.py:232","message":"Theme service initialized successfully","data":{"theme_service_is_none":g.theme_service is None},"timestamp":int(time.time()*1000)})+'\n')
+        # #endregion
     except Exception as e:
         logger.warning(f"Theme service failed: {e}")
         g.theme_service = None
+        # #region agent log
+        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
+            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"F","location":"server.py:237","message":"Theme service initialization failed","data":{"error":str(e)},"timestamp":int(time.time()*1000)})+'\n')
+        # #endregion
 
 
 def _init_vision_service(config: dict):

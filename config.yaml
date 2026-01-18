@@ -213,7 +213,7 @@ face_tracking:
     min_detection_confidence: 0.7
     min_tracking_confidence: 0.7
 vision:
-  enabled: false
+  enabled: true
   camera_type: auto
   camera_device: null
   resolution:
