@@ -256,6 +256,14 @@ vision:
     inject_system_prompt: true
     proactive_comments: true
     instructions_file: lelamp/service/vision/vision_instructions.txt
+emotion:
+  enabled: true                    # Enable emotion detection from transcriptions
+  provider: gemini                 # AI provider (gemini)
+  model: gemini-1.5-flash          # Fast model for emotion analysis (or "gemini-1.5-pro" for better accuracy)
+  auto_react: true                 # Automatically trigger animations when emotions detected
+  min_confidence: 0.7              # Minimum confidence (0-1) to trigger reaction
+  cooldown_seconds: 2.0            # Minimum seconds between reactions to prevent spam
+  # Uses GOOGLE_API_KEY from environment (same as pipeline provider)
 webui:
   enabled: true
   port: 80

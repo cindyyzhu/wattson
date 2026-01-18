@@ -227,7 +227,7 @@ vision:
   max_frame_size: 512
   instructions: 'You can see through a camera. When asked "what do you see?" or similar
     questions,
-
+    
     describe what you observe. Be concise. Don''t mention vision unless specifically
     asked.
 
@@ -240,6 +240,13 @@ vision:
     inject_system_prompt: true
     proactive_comments: true
     instructions_file: lelamp/service/vision/vision_instructions.txt
+  emotion:
+    enabled: true
+    provider: gemini
+    model: gemini-2.5-flash
+    auto_react: true
+    min_confidence: 0.7
+    cooldown_seconds: 2.0
 webui:
   enabled: true
   port: 80
@@ -249,7 +256,7 @@ spotify:
   device_name: HaloX
 modifiers:
   music:
-    enabled: true
+    enabled: false
     amplitude: 12.0
     beat_divisor: 1.0
     groove: 0.3
@@ -263,12 +270,12 @@ modifiers:
     amplitude: 2.0
     frequency: 0.2
   twitch:
-    enabled: true
+    enabled: false
     amplitude: 3.0
     min_interval: 3.0
     max_interval: 10.0
   sway:
-    enabled: true
+    enabled: false
     amplitude: 8.0
     frequency: 0.15
 rgb:

@@ -101,6 +101,9 @@ def init_hardware_services():
     # Theme Service - always start
     _init_theme_service(config)
 
+    # Emotion Service - if enabled in config
+    _init_emotion_service(config)
+
     # Vision Service - if vision or face_tracking enabled
     if config.get("vision", {}).get("enabled", True) or config.get("face_tracking", {}).get("enabled", False):
         _init_vision_service(config)
@@ -238,6 +241,21 @@ def _init_theme_service(config: dict):
     except Exception as e:
         logger.warning(f"Theme service failed: {e}")
         g.theme_service = None
+
+
+def _init_emotion_service(config: dict):
+    """Initialize emotion analysis service."""
+    from lelamp.service.emotion import init_emotion_service
+
+    try:
+        g.emotion_service = init_emotion_service(config)
+        if g.emotion_service:
+            logger.info("Emotion service initialized")
+        else:
+            logger.info("Emotion service disabled or not configured")
+    except Exception as e:
+        logger.warning(f"Emotion service failed: {e}")
+        g.emotion_service = None
 
 
 def _init_vision_service(config: dict):

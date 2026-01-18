@@ -33,6 +33,7 @@ audio_service = None
 microphone_service = None  # Microphone input processing with VAD/AEC
 audio_router = None  # Routes processed audio through loopback to LiveKit
 theme_service = None
+emotion_service = None  # Emotion analysis and reactive animations
 spotify_service = None  # Spotify integration
 agent_session_global = None
 livekit_room = None  # LiveKit room reference for disconnect/reconnect

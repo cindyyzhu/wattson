@@ -216,6 +216,22 @@ class LocalSTTService:
 
                     if text:
                         logger.info(f"Transcribed: {text}")
+                        
+                        # Trigger emotion analysis and reaction
+                        try:
+                            from lelamp.service.emotion import get_emotion_service
+                            emotion_service = get_emotion_service()
+                            if emotion_service:
+                                # Run in background thread to not block main flow
+                                import threading
+                                threading.Thread(
+                                    target=emotion_service.trigger_reaction,
+                                    args=(text,),
+                                    daemon=True
+                                ).start()
+                        except Exception as e:
+                            logger.debug(f"Emotion analysis failed: {e}")
+                        
                         return (text, stt_time, audio_duration)
 
         return None

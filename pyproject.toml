@@ -45,6 +45,7 @@ dependencies = [
     "soundfile>=0.13.1",
     "librosa>=0.11.0",
     "mediapipe==0.10.14",
+    "google-generativeai>=0.3.0",
 ]
 
 [tool.uv.sources]

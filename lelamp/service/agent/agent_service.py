@@ -246,6 +246,21 @@ class LLM:
                     if current_stream_type: print("") # Newline
                     print(f"[User Voice Transcription]: {transcript}")
                     current_stream_type = None
+                    
+                    # Trigger emotion analysis and reaction
+                    try:
+                        from lelamp.service.emotion import get_emotion_service
+                        emotion_service = get_emotion_service()
+                        if emotion_service:
+                            # Run in background thread to not block main flow
+                            import threading
+                            threading.Thread(
+                                target=emotion_service.trigger_reaction,
+                                args=(transcript,),
+                                daemon=True
+                            ).start()
+                    except Exception as e:
+                        logger.debug(f"Emotion analysis failed: {e}")
 
             # --- 2. AI Text Streaming Output (AI Response) ---
             # Because modalities=["text"], we listen to response.text.delta instead of audio
