@@ -15,6 +15,7 @@ from .sensor_functions import SensorFunctions
 from .sleep_functions import SleepFunctions
 from .vision_functions import VisionFunctions
 from .location_functions import LocationFunctions
+from .spotify_functions import SpotifyFunctions
 
 __all__ = [
     'MotorFunctions',
@@ -27,4 +28,5 @@ __all__ = [
     'SleepFunctions',
     'VisionFunctions',
     'LocationFunctions',
+    'SpotifyFunctions',
 ]

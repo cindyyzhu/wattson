@@ -35,6 +35,7 @@ from lelamp.functions import (
     SleepFunctions,
     VisionFunctions,
     LocationFunctions,
+    SpotifyFunctions,
 )
 import lelamp.globals as g
 from lelamp.service.theme import ThemeSound
@@ -48,7 +49,7 @@ class Agent(
     SensorFunctions,
     SleepFunctions,
     VisionFunctions,
-    # SpotifyFunctions,
+    SpotifyFunctions,
     LocationFunctions,
 ):
     def __init__(self):
