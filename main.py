@@ -158,21 +158,31 @@ def signal_handler(signum, frame):
 
 
 if __name__ == "__main__":
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
     # Register cleanup handlers
     atexit.register(cleanup_services)
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
 
     # Start WebUI server first - this initializes ALL hardware services
     # Services are stored in globals and used by both WebUI and Agent
     # Looking into this function will help you understand how the code works
     start_webui_server()
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
 
     # Check if agent is enabled
     agent_config = CONFIG.get("agent", {})
     agent_enabled = agent_config.get("enabled", True)
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
 
     has_mic, has_speaker, audio_error = check_audio_hardware()
+
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
 
     if not has_mic:
         logging.warning("No microphone detected - disabling voice agent")
@@ -181,6 +191,9 @@ if __name__ == "__main__":
     elif not has_speaker:
         logging.warning("No speaker detected - audio output may not work")
 
+        logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
+
     # Keep the process running (for WebUI) but don't start agent
     def keep_alive(signum, frame):
         print("\nShutting down...")
@@ -188,4 +201,11 @@ if __name__ == "__main__":
 
     signal.signal(signal.SIGINT, keep_alive)
     signal.signal(signal.SIGTERM, keep_alive)
+
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
+    print("##########################################################################################################################################################")
+    print("THIS IS SO ANNOYINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+    print("SEND HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
 
