@@ -16,6 +16,10 @@ async def play_party_music(self, party_theme: str) -> str:
     """
     print(f"LeLamp: play_party_music called with theme={party_theme}")
 
+    # Try to call the agent's method if available
+    if hasattr(self, 'play_party_music_internal'):
+        return await self.play_party_music_internal(party_theme)
+
     theme_lower = party_theme.lower()
 
     # Map party themes to Spotify search queries
@@ -74,9 +78,9 @@ async def play_party_music(self, party_theme: str) -> str:
     if not search_query:
         search_query = f"{party_theme} party music"
 
-    # Try to play using Spotify service
+    # Try to play using Spotify service via self
     try:
-        if hasattr(self, 'spotify_service') and self.spotify_service and self.spotify_service._sp:
+        if hasattr(self, 'spotify_service') and self.spotify_service and hasattr(self.spotify_service, '_sp'):
             success = self.spotify_service.play_search(search_query)
             if success:
                 # Give it a moment to start
@@ -106,8 +110,6 @@ async def party_rgb_animation(self, party_theme: str) -> str:
     Returns:
         Confirmation that party lighting has been activated
     """
-    from lelamp.globals import rgb_service
-
     print(f"LeLamp: party_rgb_animation called with theme={party_theme}")
 
     theme_lower = party_theme.lower()
@@ -115,81 +117,81 @@ async def party_rgb_animation(self, party_theme: str) -> str:
     # Map themes to RGB animations and colors
     if "birthday" in theme_lower or "celebration" in theme_lower:
         # Colorful rainbow party vibes
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "party",
-                "color": (255, 100, 200)  # Bright pink/magenta
-            })
-        return "Party lights activated! Colorful celebration mode with rainbow animations!"
+        result = await self.play_rgb_animation("party", 255, 100, 200)
+        return f"Party lights activated! Colorful celebration mode with rainbow animations! {result}"
 
     elif "christmas" in theme_lower or "xmas" in theme_lower:
         # Red and green alternating
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "pulse",
-                "color": (255, 0, 0)  # Red, will alternate with green
-            })
-        return "Christmas party lights activated! Festive red and green colors!"
+        result = await self.play_rgb_animation("pulse", 255, 0, 0)
+        return f"Christmas party lights activated! Festive red and green colors! {result}"
 
     elif "halloween" in theme_lower:
         # Orange and purple spooky vibes
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "spooky",
-                "color": (255, 100, 0)  # Orange
-            })
-        return "Halloween party lights activated! Spooky orange and purple vibes!"
+        result = await self.play_rgb_animation("ripple", 255, 100, 0)
+        return f"Halloween party lights activated! Spooky orange and purple vibes! {result}"
 
     elif "new year" in theme_lower:
         # Gold and silver sparkle
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "sparkle",
-                "color": (255, 215, 0)  # Gold
-            })
-        return "New Year's party lights activated! Sparkling gold celebration mode!"
+        result = await self.play_rgb_animation("burst", 255, 215, 0)
+        return f"New Year's party lights activated! Sparkling gold celebration mode! {result}"
 
     elif "valentine" in theme_lower:
         # Romantic red and pink
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "pulse",
-                "color": (255, 20, 60)  # Deep pink/red
-            })
-        return "Valentine's party lights activated! Romantic red and pink glow!"
+        result = await self.play_rgb_animation("pulse", 255, 20, 60)
+        return f"Valentine's party lights activated! Romantic red and pink glow! {result}"
 
     elif "st patrick" in theme_lower or "irish" in theme_lower:
         # Green party vibes
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "wave",
-                "color": (0, 255, 0)  # Bright green
-            })
-        return "St. Patrick's party lights activated! Lucky green vibes!"
+        result = await self.play_rgb_animation("wave", 0, 255, 0)
+        return f"St. Patrick's party lights activated! Lucky green vibes! {result}"
 
     elif "tropical" in theme_lower or "beach" in theme_lower or "pool" in theme_lower:
         # Blue and turquoise ocean vibes
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "wave",
-                "color": (0, 200, 255)  # Turquoise
-            })
-        return "Tropical party lights activated! Cool ocean blue waves!"
+        result = await self.play_rgb_animation("wave", 0, 200, 255)
+        return f"Tropical party lights activated! Cool ocean blue waves! {result}"
 
     elif "dance" in theme_lower or "disco" in theme_lower:
         # Multi-color strobe/party effect
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "party",
-                "color": (255, 0, 255)  # Magenta
-            })
-        return "Dance party lights activated! Strobing multi-color disco vibes!"
+        result = await self.play_rgb_animation("party", 255, 0, 255)
+        return f"Dance party lights activated! Strobing multi-color disco vibes! {result}"
 
     else:
         # Default party animation - colorful and energetic
-        if rgb_service:
-            rgb_service.dispatch("animation", {
-                "name": "party",
-                "color": (255, 150, 0)  # Orange
-            })
-        return "Party lights activated! Energetic multi-color party mode!"
+        result = await self.play_rgb_animation("party", 255, 150, 0)
+        return f"Party lights activated! Energetic multi-color party mode! {result}"
+
+
+@function_tool
+async def party_start_sound_effect(self) -> str:
+    """
+    Play an exciting sound effect to kick off the party!
+    
+    Returns:
+        Confirmation that the sound was played
+    """
+    print("LeLamp: party_start_sound_effect called")
+    try:
+        result = await self.play_sound_effect("success")
+        return f"Party kickoff sound played! {result}"
+    except Exception as e:
+        return f"Error playing party sound: {str(e)}"
+
+
+@function_tool
+async def party_play_recording(self, recording_name: str) -> str:
+    """
+    Play a movement recording to show party excitement with physical moves!
+    
+    Args:
+        recording_name: Name of the recording to play (e.g., "excited", "dancing1")
+    
+    Returns:
+        Confirmation that the recording is playing
+    """
+    print(f"LeLamp: party_play_recording called with recording={recording_name}")
+    try:
+        result = await self.play_recording(recording_name)
+        return result
+    except Exception as e:
+        return f"Error playing recording: {str(e)}"
+

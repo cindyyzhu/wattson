@@ -185,3 +185,46 @@ async def check_user_awake_vision(self) -> str:
 
     except Exception as e:
         return f"Error checking vision: {str(e)} - Ask the user directly if they're awake."
+
+
+@function_tool
+async def alarm_play_animation(self, animation_name: str) -> str:
+    """
+    Play a physical animation/movement recording to wake up the user.
+    
+    Good animations for waking someone up:
+    - "wake_up": Energetic wake-up movement
+    - "nod": Encouraging nod
+    - "excited": Excited bouncy movement
+    - "look_up": Looking upward encouraging
+    
+    Args:
+        animation_name: Name of the animation to play (e.g., "wake_up", "excited")
+    
+    Returns:
+        Confirmation that the animation is playing
+    """
+    print(f"LeLamp: alarm_play_animation called with animation={animation_name}")
+    try:
+        result = await self.play_recording(animation_name)
+        return result
+    except Exception as e:
+        return f"Error playing animation: {str(e)}"
+
+
+@function_tool
+async def alarm_rgb_wake_effect(self) -> str:
+    """
+    Play an energetic RGB animation to help wake up the user. Uses bright, energetic
+    colors and animations to encourage waking up.
+    
+    Returns:
+        Confirmation that the wake-up effect is playing
+    """
+    print("LeLamp: alarm_rgb_wake_effect called")
+    try:
+        # Play an energetic burst animation in orange/yellow (warm, energizing colors)
+        result = await self.play_rgb_animation("burst", 255, 150, 0)
+        return f"Wake-up light activated! {result}"
+    except Exception as e:
+        return f"Error playing wake-up effect: {str(e)}"

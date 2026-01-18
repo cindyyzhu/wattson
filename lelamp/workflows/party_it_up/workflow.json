@@ -38,8 +38,8 @@
     },
     {
       "id": "announce_party_start",
-      "intent": "IT'S PARTY TIME! Make an exciting, enthusiastic announcement that the party is starting NOW! Be energetic and fun! Say something like 'Let's get this party started!' or 'Party time, everyone!' Play an exciting sound effect to kick things off. After announcing, immediately call complete_step() to move to the next step.",
-      "preferred_actions": ["play_sound_effect"]
+      "intent": "IT'S PARTY TIME! Make an exciting, enthusiastic announcement that the party is starting NOW! Be energetic and fun! Say something like 'Let's get this party started!' or 'Party time, everyone!' Call party_start_sound_effect to play an exciting sound effect. Then call party_play_recording with 'excited' to do a fun dance move. After announcing, immediately call complete_step() to move to the next step.",
+      "preferred_actions": ["party_start_sound_effect", "party_play_recording"]
     },
     {
       "id": "choose_playlist",
@@ -48,8 +48,8 @@
     },
     {
       "id": "start_party_vibes",
-      "intent": "Music should be playing now! Play a colorful RGB animation like 'rainbow' or 'party' using play_rgb_animation. Set Spotify volume to 75% using spotify_volume. Tell everyone to have fun! Then call complete_step() to continue.",
-      "preferred_actions": ["play_rgb_animation", "spotify_volume"]
+      "intent": "Music should be playing now! Call party_rgb_animation with the party theme to activate the right colored lights. Call party_play_recording with a recording like 'dancing1' or 'excited' to show off some moves. Set Spotify volume to 75% using set_volume if you have it. Tell everyone to have fun! Then call complete_step() to continue.",
+      "preferred_actions": ["party_rgb_animation", "party_play_recording", "set_volume"]
     },
     {
       "id": "party_in_progress",

@@ -42,13 +42,13 @@
     },
     {
       "id": "check_if_sleeping",
-      "intent": "The alarm just went off! Ask the user if they're awake or still sleeping. Listen carefully to their response. If they say they're awake, up, or getting up, set user_awake to true. If they say they're still sleeping or don't respond clearly, set user_awake to false.",
-      "preferred_actions": []
+      "intent": "The alarm just went off! Call alarm_play_animation with 'wake_up' to do an energetic wake-up move, and call alarm_rgb_wake_effect to activate bright wake-up lights. Ask the user if they're awake or still sleeping. Listen carefully to their response. If they say they're awake, up, or getting up, set user_awake to true. If they say they're still sleeping or don't respond clearly, set user_awake to false.",
+      "preferred_actions": ["alarm_play_animation", "alarm_rgb_wake_effect"]
     },
     {
       "id": "tell_wake_up",
-      "intent": "The user is still sleeping! Tell them it's time to wake up in a friendly but insistent way. Then ask if they want to snooze for a few more minutes or if they're ready to get up. Listen for their response - if they ask for snooze, set wants_snooze to true.",
-      "preferred_actions": []
+      "intent": "The user is still sleeping! Call alarm_play_animation with 'nod' or 'excited' to show encouragement, and call alarm_rgb_wake_effect again to keep the lights bright. Tell them it's time to wake up in a friendly but insistent way. Then ask if they want to snooze for a few more minutes or if they're ready to get up. Listen for their response - if they ask for snooze, set wants_snooze to true.",
+      "preferred_actions": ["alarm_play_animation", "alarm_rgb_wake_effect"]
     },
     {
       "id": "set_snooze",
@@ -67,8 +67,8 @@
     },
     {
       "id": "workflow_complete",
-      "intent": "Excellent! The user is up and ready to start their day! Say something encouraging like 'Have a great day!' and do a celebratory RGB animation with bright, energetic colors.",
-      "preferred_actions": ["play_rgb_animation"]
+      "intent": "Excellent! The user is up and ready to start their day! Call alarm_play_animation with 'excited' to celebrate, and say something encouraging like 'Have a great day!' Do a celebratory RGB animation with bright, energetic colors using alarm_rgb_wake_effect.",
+      "preferred_actions": ["alarm_play_animation", "alarm_rgb_wake_effect"]
     }
   ],
   "edges": [
