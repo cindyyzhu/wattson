@@ -26,8 +26,8 @@ class AnimationFunctions:
     async def flip_coin(self) -> str:
         """
         Flip a virtual coin!
-        If it lands on Heads, I'll look up.
-        If it lands on Tails, I'll shake and wiggle!
+        If it lands on Heads, I'll do a big stretch up!
+        If it lands on Tails, I'll do a crazy excited dance!
         Use this to make random decisions or just for fun.
 
         Returns:
@@ -43,11 +43,11 @@ class AnimationFunctions:
         result = random.choice(["Heads", "Tails"])
         
         if result == "Heads":
-            action = "look_up"
-            action_desc = "looking up"
+            action = "wake_up"
+            action_desc = "stretching up high"
         else:
-            action = "happy_wiggle"
-            action_desc = "wiggling"
+            action = "dancing-excited5"
+            action_desc = "doing a crazy dance"
 
         try:
             # Dispatch the animation
