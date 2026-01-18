@@ -49,12 +49,15 @@ class RGBService(ServiceBase):
             force_driver=force_driver,
         )
 
-        # Initialize the driver if not already initialized (for non-spi drivers)
+        # Initialize the driver if not already initialized
         if not self.driver._initialized:
+            self.logger.info(f"Initializing RGB driver: {self.driver.__class__.__name__}")
             if not self.driver.initialize():
                 self.logger.error("Failed to initialize RGB driver")
                 # Continue anyway - service can still receive events
                 # (useful for debugging or when RGB is optional)
+            else:
+                self.logger.info(f"RGB driver initialized successfully: {self.driver.__class__.__name__}")
 
         # Initialize RGB controller
         self.controller = RGBController(led_count=led_count)
@@ -77,15 +80,16 @@ class RGBService(ServiceBase):
         # Track current animation name
         self._current_animation = default_animation
 
-        # Set up callback for controller to render via driver
-        self.controller.set_render_callback(self._render_frame_to_strip)
-
         # Lock to prevent simultaneous renders
         import threading
         self._render_lock = threading.Lock()
 
         # Sleep mode - blocks all RGB changes when enabled
         self._sleep_mode = False
+
+        # Set up callback for controller to render via driver AFTER all setup
+        # This ensures driver is fully initialized before callbacks start
+        self.controller.set_render_callback(self._render_frame_to_strip)
 
         # Ensure LEDs start OFF (prevents random white on power-up)
         self.clear()
@@ -95,6 +99,11 @@ class RGBService(ServiceBase):
         # Use lock to ensure only one render happens at a time
         with self._render_lock:
             try:
+                # Verify driver is initialized before rendering
+                if not self.driver._initialized:
+                    self.logger.debug("Driver not initialized, skipping render")
+                    return
+                
                 # Render via driver
                 self.driver.render(frame)
                 # No delay needed - the driver handles timing internally

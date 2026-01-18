@@ -16,7 +16,17 @@ WIRING:
 """
 
 from typing import List, Tuple
+import os
+import time
+import logging
 from .base import RGBDriver
+
+# Initialize Blinka early to detect setup issues
+try:
+    import board
+    import neopixel
+except ImportError:
+    pass
 
 
 class Pi5PioDriver(RGBDriver):
@@ -95,8 +105,6 @@ class Pi5PioDriver(RGBDriver):
 
     def initialize(self) -> bool:
         """Initialize the NeoPixel PIO hardware."""
-        import time
-
         # Clean up any previous instance first (important after crashes)
         if self._pixels is not None:
             self.logger.warning("Previous NeoPixel instance exists, cleaning up first...")
@@ -129,21 +137,28 @@ class Pi5PioDriver(RGBDriver):
             self.logger.debug(f"Creating NeoPixel object with brightness={self._brightness}/255...")
 
             # Create NeoPixel object
+            # IMPORTANT: Use auto_write=True to automatically update on pixel changes
+            # This ensures frame renders properly
             self._pixels = neopixel.NeoPixel(
                 self._board_pin,
                 self.led_count,
                 brightness=self._brightness / 255.0,
-                auto_write=self._auto_write,
+                auto_write=True,  # FIXED: Enable auto_write for immediate rendering
                 pixel_order=order,
             )
 
             # Brief pause after creation
-            time.sleep(0.05)
+            time.sleep(0.1)
 
             # Test with a quick black frame to verify communication
             self.logger.debug("Testing LED communication with black frame...")
             self._pixels.fill((0, 0, 0))
-            self._pixels.show()
+            # No need to call show() with auto_write=True
+            time.sleep(0.1)
+
+            # Verify initialization by checking pixel data
+            if self._pixels is None or len(self._pixels) != self.led_count:
+                raise RuntimeError(f"NeoPixel initialization failed: pixel count mismatch")
 
             self._initialized = True
             self.logger.info(
@@ -194,16 +209,17 @@ class Pi5PioDriver(RGBDriver):
             # Set all pixels
             for i, (r, g, b) in enumerate(frame):
                 if i < self.led_count:
+                    # NeoPixel library will auto-write with auto_write=True
                     self._pixels[i] = (r, g, b)
-
-            # Push to hardware
-            self._pixels.show()
+            
+            # With auto_write=True, no need to explicitly call show()
+            # But we can optionally call it for manual control if needed
+            # self._pixels.show()  # Uncomment if auto_write becomes False
 
         except OSError as e:
             # PIO/GPIO errors - these can crash the Pi if we keep hammering
             self.logger.error(f"PIO/GPIO error rendering frame: {e}")
             # Brief pause to prevent rapid error loops
-            import time
             time.sleep(0.1)
         except Exception as e:
             self.logger.error(f"Error rendering frame: {e}")
@@ -223,7 +239,7 @@ class Pi5PioDriver(RGBDriver):
             # Turn off all LEDs
             try:
                 self._pixels.fill((0, 0, 0))
-                self._pixels.show()
+                # With auto_write=True, this is immediately visible
             except Exception as e:
                 self.logger.warning(f"Error turning off LEDs during cleanup: {e}")
 
@@ -239,7 +255,6 @@ class Pi5PioDriver(RGBDriver):
         # The neopixel library manages PIO resources internally.
         # Manually calling lgpio to release pins causes conflicts and crashes.
 
-        import time
         time.sleep(0.05)  # Brief pause to let PIO resources release
 
         self._initialized = False
