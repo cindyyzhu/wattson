@@ -208,6 +208,7 @@ JSON response:"""
             # Validate result
             emotion_str = result.get("emotion", "").lower()
             confidence = float(result.get("confidence", 0.0))
+            reasoning = result.get("reasoning", "")
             
             # Map to Emotion enum
             emotion_map = {
@@ -234,11 +235,18 @@ JSON response:"""
             
             emotion = emotion_map.get(emotion_str, Emotion.NEUTRAL)
             
+            # Log detected emotion with details
+            self.logger.info(
+                f"Emotion detected: '{emotion.value}' (raw: '{emotion_str}') "
+                f"with confidence {confidence:.2f} "
+                f"- Reasoning: {reasoning[:100] if reasoning else 'N/A'}"
+            )
+            
             return {
                 "emotion": emotion,
                 "emotion_str": emotion.value,
                 "confidence": confidence,
-                "reasoning": result.get("reasoning", ""),
+                "reasoning": reasoning,
                 "raw_response": response_text
             }
             
@@ -289,8 +297,10 @@ JSON response:"""
                 return False
         
         # Analyze emotion
+        self.logger.debug(f"Analyzing emotion for text: '{text[:100]}...'")
         result = self.analyze_emotion(text)
         if not result:
+            self.logger.debug("Emotion analysis returned no result")
             return False
         
         emotion = result["emotion"]
@@ -298,18 +308,24 @@ JSON response:"""
         
         # Check minimum confidence
         if confidence < self.min_confidence:
-            self.logger.debug(f"Emotion detected ({emotion.value}) but confidence ({confidence:.2f}) below threshold ({self.min_confidence})")
+            self.logger.info(
+                f"Emotion '{emotion.value}' detected with confidence {confidence:.2f} "
+                f"below threshold {self.min_confidence} - skipping reaction"
+            )
             return False
         
         # Skip neutral emotions
         if emotion == Emotion.NEUTRAL:
+            self.logger.debug(f"Neutral emotion detected - skipping reaction")
             return False
         
         # Map to recording
         recording_name = self.map_emotion_to_recording(emotion)
         if not recording_name:
-            self.logger.warning(f"No recording mapping for emotion: {emotion.value}")
+            self.logger.warning(f"No recording mapping found for emotion: {emotion.value}")
             return False
+        
+        self.logger.info(f"Mapped emotion '{emotion.value}' to recording: '{recording_name}'")
         
         # Check if animation service is available
         if not g.animation_service:
@@ -324,7 +340,10 @@ JSON response:"""
         # Trigger animation (non-blocking)
         try:
             g.animation_service.dispatch("play", recording_name)
-            self.logger.info(f"Triggered emotion reaction: {emotion.value} -> {recording_name} (confidence: {confidence:.2f})")
+            self.logger.info(
+                f"✅ Emotion reaction triggered: '{emotion.value}' → '{recording_name}' "
+                f"(confidence: {confidence:.2f}, text: '{text[:50]}...')"
+            )
             
             # Update cooldown
             with self._cooldown_lock:
@@ -332,5 +351,5 @@ JSON response:"""
             
             return True
         except Exception as e:
-            self.logger.error(f"Error triggering animation: {e}")
+            self.logger.error(f"Error triggering animation for emotion '{emotion.value}': {e}")
             return False
