@@ -189,6 +189,8 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, keep_alive)
     signal.signal(signal.SIGTERM, keep_alive)
 
+    logging.info("HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+
     print("##########################################################################################################################################################")
     print("THIS IS SO ANNOYINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
     print("SEND HELPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
