@@ -7,11 +7,139 @@ This module contains vision-related function tools including:
 """
 
 import logging
+import cv2
+import mediapipe as mp
+import random
+import numpy as np
 from lelamp.service.agent.tools import Tool
 
 
 class VisionFunctions:
     """Mixin class providing vision function tools"""
+
+    @Tool.register_tool
+    async def play_rock_paper_scissors(self) -> str:
+        """
+        Play a game of Rock, Paper, Scissors with me!
+        Show your hand to the camera.
+        I will look at your hand, see what you chose, and then make my move!
+        
+        My moves:
+        - Rock: I curl up (Head Down)
+        - Paper: I stretch up (Wake Up)
+        - Scissors: I do a happy wiggle
+        
+        Returns:
+            The result of the game (Win/Lose/Tie) and what happened.
+        """
+        from lelamp.globals import animation_service
+
+        print("LeLamp: play_rock_paper_scissors function called")
+
+        if self.is_sleeping:
+            return "I'm sleeping right now. Wake me up to play!"
+
+        # Initialize MediaPipe Hands
+        mp_hands = mp.solutions.hands
+        
+        # Try to open camera
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            return "I couldn't open my eyes (camera) to see your hand. Maybe I'm already using them for something else?"
+
+        try:
+            with mp_hands.Hands(
+                static_image_mode=True,
+                max_num_hands=1,
+                min_detection_confidence=0.5
+            ) as hands:
+                
+                # Capture a few frames to let camera settle, but just use the last one
+                for _ in range(5):
+                    ret, frame = cap.read()
+                    if not ret:
+                        break
+                
+                if not ret:
+                    return "I tried to look, but I couldn't see anything (camera error)."
+
+                # Process frame
+                # Flip horizontally for a mirror view interaction (optional, but standard)
+                # frame = cv2.flip(frame, 1) 
+                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                results = hands.process(rgb_frame)
+
+                if not results.multi_hand_landmarks:
+                    return "I didn't see your hand! Make sure it's in front of my camera."
+
+                # Analyze Hand Gesture
+                hand_landmarks = results.multi_hand_landmarks[0]
+                
+                # Count extended fingers (Index, Middle, Ring, Pinky)
+                # Tip (4, 8, 12, 16, 20) vs PIP (2, 6, 10, 14, 18)
+                # Note: Y increases downwards in image coordinates. 
+                # So Tip < PIP means Tip is higher (extended up).
+                
+                finger_tips = [8, 12, 16, 20]
+                finger_pips = [6, 10, 14, 18]
+                extended_fingers = 0
+                
+                for tip, pip in zip(finger_tips, finger_pips):
+                    if hand_landmarks.landmark[tip].y < hand_landmarks.landmark[pip].y:
+                        extended_fingers += 1
+
+                # Thumb is special (compare x for side-to-side, but simpler to ignore or loose check)
+                # Let's stick to the 4 main fingers for R/P/S robustness
+                
+                user_move = "Unknown"
+                if extended_fingers >= 4:
+                    user_move = "Paper"
+                elif extended_fingers == 2:
+                    # Check if it's index and middle (Scissors)
+                    # Ideally check specific fingers, but count 2 is usually scissors in this context
+                    user_move = "Scissors"
+                elif extended_fingers <= 1:
+                    user_move = "Rock"
+                else:
+                    # Ambiguous (3 fingers? Claw?) - Guess Paper or Rock?
+                    # Let's say "I'm not sure" or default to Rock
+                    user_move = "Rock" # Default to rock for loose fists
+
+                # Bot Move
+                bot_move = random.choice(["Rock", "Paper", "Scissors"])
+                
+                # Animations
+                # Rock -> head_down
+                # Paper -> wake_up
+                # Scissors -> happy_wiggle
+                anim_map = {
+                    "Rock": "head_down",
+                    "Paper": "wake_up",
+                    "Scissors": "happy_wiggle"
+                }
+                
+                # Determine Winner
+                result = "Tie"
+                if user_move == bot_move:
+                    result = "It's a Tie!"
+                elif (user_move == "Rock" and bot_move == "Scissors") or \
+                     (user_move == "Paper" and bot_move == "Rock") or \
+                     (user_move == "Scissors" and bot_move == "Paper"):
+                    result = "You Win!"
+                else:
+                    result = "I Win!"
+
+                # Play Animation
+                if animation_service:
+                    animation_service.dispatch("play", anim_map[bot_move])
+
+                return f"You showed {user_move}. I chose {bot_move} ({anim_map[bot_move]} action). {result}"
+
+        except Exception as e:
+            logging.error(f"Error in play_rock_paper_scissors: {e}")
+            return f"Oops, something went wrong while playing: {str(e)}"
+        finally:
+            cap.release()
 
     @Tool.register_tool
     async def describe_scene(self) -> str:

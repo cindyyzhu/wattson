@@ -7,7 +7,7 @@ requires-python = ">=3.11,<3.14"
 dependencies = [
     "feetech-servo-sdk>=1.0.0",
     "lerobot>=0.3.3",
-    "numpy>=2.2.6",
+    "numpy<2",
     "pyarrow==20.0.0",
     "pyaudio>=0.2.14",
     "python-dotenv",
@@ -30,7 +30,7 @@ dependencies = [
     "faster-whisper>=1.0.0",
     "soxr>=0.3.0",
     # opencv-python-headless at end + override-dependencies ensures headless is used
-    "opencv-python-headless>=4.11.0.86",
+    "opencv-python-headless==4.9.0.80",
     "torchaudio>=2.7.1",
     "rpi-ws281x>=5.0.0",
     "lgpio>=0.2.2.0",
@@ -44,7 +44,7 @@ dependencies = [
     "scipy>=1.17.0",
     "soundfile>=0.13.1",
     "librosa>=0.11.0",
-    "mediapipe==0.10.14",
+    "mediapipe==0.10.9",
     "google-generativeai>=0.3.0",
 ]
 
@@ -54,7 +54,7 @@ lerobot = { git = "https://github.com/huggingface/lerobot" }
 [tool.uv]
 # Force headless opencv - prevents lerobot from pulling in the GUI version
 override-dependencies = [
-    "opencv-python>=4.11.0.86 ; sys_platform == 'never'",
+    "opencv-python>=4.9.0.80 ; sys_platform == 'never'",
 ]
 
 [project.optional-dependencies]
