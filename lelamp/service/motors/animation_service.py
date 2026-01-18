@@ -817,37 +817,20 @@ class AnimationService:
         Args:
             hand_data: MediaPipeHandData object
         """
-        # #region agent log
-        import json, time
-        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"C,D,E","location":"animation_service.py:812","message":"hand_control_callback() entry","data":{"hand_detected":hand_data.detected if hand_data else False,"is_pinching":hand_data.is_pinching if hand_data else False},"timestamp":int(time.time()*1000)})+'\n')
-        # #endregion
         # Reference external animation_service instance
         # In actual use, you may need to make it a class member method, or use closure/global variable
 
         # 1. Basic check: Is hand detected
         if not hand_data.detected:
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"B","location":"animation_service.py:824","message":"Hand not detected - returning","data":{},"timestamp":int(time.time()*1000)})+'\n')
-            # #endregion
             return
 
         # 2. Core logic: Control motors only in "pinching" state
         if hand_data.is_pinching:
             # Get normalized coordinates (-1.0 ~ 1.0)
             x, y = hand_data.position
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"C","location":"animation_service.py:828","message":"Pinching detected","data":{"position":(x,y)},"timestamp":int(time.time()*1000)})+'\n')
-            # #endregion
 
             # 3. Calculate target angles
             target_yaw, target_pitch = self.calculate_hand_target_angles(x, y)
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"C","location":"animation_service.py:833","message":"Target angles calculated","data":{"target_yaw":target_yaw,"target_pitch":target_pitch},"timestamp":int(time.time()*1000)})+'\n')
-            # #endregion
 
             # 4. Construct command packet
             # Note: Assuming control of base (base_yaw) and head (base_pitch/head_pitch)
@@ -859,55 +842,20 @@ class AnimationService:
 
             # 5. Send command
             # Check if robot is connected to avoid errors
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"D","location":"animation_service.py:845","message":"Before robot check","data":{"robot_is_none":self.robot is None,"manual_control_override":getattr(self,'manual_control_override',False)},"timestamp":int(time.time()*1000)})+'\n')
-            # #endregion
             if self.robot:
                 try:
                     # Try to acquire lock non-blocking, prevent freezing in this high-frequency callback
-                    # #region agent log
-                    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"E","location":"animation_service.py:848","message":"Attempting to acquire bus lock","data":{},"timestamp":int(time.time()*1000)})+'\n')
-                    # #endregion
                     if self._bus_lock.acquire(blocking=False):
-                        # #region agent log
-                        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"E","location":"animation_service.py:849","message":"Bus lock acquired - sending action","data":{"action":action},"timestamp":int(time.time()*1000)})+'\n')
-                        # #endregion
                         self.robot.send_action(action)
                         self._bus_lock.release()
-                        # #region agent log
-                        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"E","location":"animation_service.py:850","message":"Action sent successfully","data":{},"timestamp":int(time.time()*1000)})+'\n')
-                        # #endregion
 
                         # Optional: Print debug info
                         # print(f"👆 Pinching! Moving to Yaw: {target_yaw:.1f}, Pitch: {target_pitch:.1f}")
-                    else:
-                        # #region agent log
-                        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"E","location":"animation_service.py:851","message":"Bus lock acquisition failed (non-blocking)","data":{},"timestamp":int(time.time()*1000)})+'\n')
-                        # #endregion
                 except Exception as e:
                     print(f"Error sending hand action: {e}")
-                    # #region agent log
-                    import traceback
-                    with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                        f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"D","location":"animation_service.py:855","message":"Exception in hand control callback","data":{"error":str(e),"error_type":type(e).__name__,"traceback":traceback.format_exc()},"timestamp":int(time.time()*1000)})+'\n')
-                    # #endregion
-            else:
-                # #region agent log
-                with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                    f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"D","location":"animation_service.py:857","message":"Robot is None - cannot send action","data":{},"timestamp":int(time.time()*1000)})+'\n')
-                # #endregion
 
         else:
             # Optional: Do nothing when not pinching, or let it slowly return to origin
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"C","location":"animation_service.py:858","message":"Hand detected but not pinching","data":{},"timestamp":int(time.time()*1000)})+'\n')
-            # #endregion
             pass
 
     def calculate_hand_target_angles(self, x: float, y: float) -> tuple[float, float]:

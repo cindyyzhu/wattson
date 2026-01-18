@@ -98,21 +98,8 @@ class Agent(
         # self._setup_alarm_service()
 
         # Play startup animation and sound
-        # #region agent log
-        import json
-        with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-            f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"agent_service.py:101","message":"Agent init - theme_service check","data":{"theme_service_is_none":self.theme_service is None},"timestamp":int(__import__('time').time()*1000)})+'\n')
-        # #endregion
         if self.theme_service:
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"agent_service.py:102","message":"Calling theme_service.play(STARTUP)","data":{},"timestamp":int(__import__('time').time()*1000)})+'\n')
-            # #endregion
-            result = self.theme_service.play(ThemeSound.STARTUP)
-            # #region agent log
-            with open('/Users/aadya/Desktop/wattson/.cursor/debug.log', 'a') as f:
-                f.write(json.dumps({"sessionId":"debug-session","runId":"run1","hypothesisId":"A","location":"agent_service.py:102","message":"theme_service.play() returned","data":{"result":result},"timestamp":int(__import__('time').time()*1000)})+'\n')
-            # #endregion
+            self.theme_service.play(ThemeSound.STARTUP)
 
         if self.animation_service:
             self.animation_service.dispatch("play", "wake_up")

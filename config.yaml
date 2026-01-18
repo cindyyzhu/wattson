@@ -197,7 +197,7 @@ pushable_mode:
   poll_rate: 30
   return_to_idle: true
 face_tracking:
-  enabled: false
+  enabled: true
   engine: opencv
   camera_index: /dev/usbcam
   resolution:
@@ -244,12 +244,12 @@ webui:
   enabled: true
   port: 80
 spotify:
-  enabled: true
+  enabled: false
   redirect_uri: http://127.0.0.1:8888/api/v1/spotify/auth/callback
   device_name: HaloX
 modifiers:
   music:
-    enabled: false
+    enabled: true
     amplitude: 12.0
     beat_divisor: 1.0
     groove: 0.3
@@ -259,16 +259,16 @@ modifiers:
     excited_threshold: 0.6
     joint: wrist_pitch.pos
   breathing:
-    enabled: false
+    enabled: true
     amplitude: 2.0
     frequency: 0.2
   twitch:
-    enabled: false
+    enabled: true
     amplitude: 3.0
     min_interval: 3.0
     max_interval: 10.0
   sway:
-    enabled: false
+    enabled: true
     amplitude: 8.0
     frequency: 0.15
 rgb:
