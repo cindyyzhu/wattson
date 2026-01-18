@@ -358,4 +358,9 @@ def _log_access_urls(port: int):
     if primary_ip:
         print(f"\n{'='*60}")
         print(f"WebUI: http://{primary_ip}:{port}")
+        print("HELP ME PLEASE")
+        print("GOD DAMN IT")
+        print("STOP BEING ANNOYING")
+        print("WHY CAN'T YOU JUST LET ME WORK IN PEACE")
+        print("qwertyuiopasdfghjklzxcvbnm")
         print(f"{'='*60}\n")
