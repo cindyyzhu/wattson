@@ -295,7 +295,7 @@ class LLM:
                 response_create_event = {
                     "type": "response.create",
                     "response": {
-                        "modalities": ["audio"],
+                        "modalities": ["text"],
                     }
                 }
                 await websocket.send(json.dumps(response_create_event))
@@ -317,7 +317,7 @@ class LLM:
             session_update = {
                 "type": "session.update",
                 "session": {
-                    "modalities": ["audio"],
+                    "modalities": ["text"],
                     "voice": "alloy",  # Optional: alloy, ash, ballad, coral, echo, sage, shimmer, verse
                     "input_audio_format": "pcm16",
                     "output_audio_format": "pcm16",
