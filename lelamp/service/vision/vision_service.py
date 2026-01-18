@@ -144,6 +144,7 @@ class VisionService:
         # Logic: First Face Detection Sound
         self._face_detected_once = False
         self._last_face_detected = False
+        self._last_face_reaction_time = 0.0
 
     def start(self):
         """Start vision service"""
@@ -257,18 +258,35 @@ class VisionService:
                 with self._hand_lock:
                     self.latest_hand_data = hand_data
 
-            # 6. "First Face Detected" Sound Logic
+            # 6. Face Detection Reaction Logic
             if face_data.detected and not self._last_face_detected:
-                if not self._face_detected_once:
-                    self._face_detected_once = True
+                current_time = time.time()
+                
+                # Check for 10s timeout/cooldown
+                if (current_time - self._last_face_reaction_time) > 10.0:
+                    self._last_face_reaction_time = current_time
+                    
+                    # Trigger Excited Animation
                     try:
-                        from lelamp.service.theme import get_theme_service, ThemeSound
-                        theme = get_theme_service()
-                        if theme:
-                            theme.play(ThemeSound.FACE_DETECT)
-                            self.logger.info("First face detected - played theme sound")
+                        import lelamp.globals as g
+                        if g.animation_service:
+                            g.animation_service.dispatch("play", "luxo_excited")
+                            self.logger.info("Face detected - triggering luxo_excited animation")
                     except Exception as e:
-                        self.logger.warning(f"Could not play face detect sound: {e}")
+                        self.logger.warning(f"Could not trigger animation: {e}")
+
+                    # Play Sound (First time only)
+                    if not self._face_detected_once:
+                        self._face_detected_once = True
+                        try:
+                            from lelamp.service.theme import get_theme_service, ThemeSound
+                            theme = get_theme_service()
+                            if theme:
+                                theme.play(ThemeSound.FACE_DETECT)
+                                self.logger.info("First face detected - played theme sound")
+                        except Exception as e:
+                            self.logger.warning(f"Could not play face detect sound: {e}")
+            
             self._last_face_detected = face_data.detected
 
             # 7. Dispatch Callbacks
