@@ -77,7 +77,7 @@ def get_driver(
                 led_pin=led_pin,
                 led_brightness=led_brightness,
                 pixel_order=pixel_order,
-                auto_write=False,
+                auto_write=True,  # FIXED: Must be True for pixels to update
             )
             if driver.initialize():
                 logger.info(f"Using Pi5 PIO RGB driver (GPIO {led_pin})")

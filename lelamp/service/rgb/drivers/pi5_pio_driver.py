@@ -55,7 +55,7 @@ class Pi5PioDriver(RGBDriver):
         led_pin: int = 10,
         led_brightness: int = 255,
         pixel_order: str = "GRB",
-        auto_write: bool = False,
+        auto_write: bool = True,  # FIXED: Changed to True by default
     ):
         """
         Initialize Pi 5 PIO driver.
